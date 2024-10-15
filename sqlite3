@@ -27,9 +27,9 @@ async def upload_file(update: Update, context):
         conn.commit()
         conn.close()
 
-        await update.message.reply_text(f"File uploaded successfully! Link: {file_link}")
+        await update.message.reply_text(f"تم رفع الملف بنجاح! الرابط: {file_link}")
     else:
-        await update.message.reply_text("Please send a file.")
+        await update.message.reply_text("الرجاء إرسال ملف.")
 
 async def list_files(update: Update, context):
     user_id = update.message.from_user.id
@@ -41,21 +41,30 @@ async def list_files(update: Update, context):
     conn.close()
 
     if files:
-        response = "Stored files:\n"
+        response = "الملفات المخزنة:\n"
         for file in files:
             response += f"{file[0]}\n"
         await update.message.reply_text(response)
     else:
-        await update.message.reply_text("No stored files.")
+        await update.message.reply_text("لا توجد ملفات مخزنة.")
 
 async def start(update: Update, context):
-    await update.message.reply_text("Welcome! Send me your files, and I'll store them for you.")
+    await update.message.reply_text("مرحبًا! أرسل لي ملفاتك وسأخزنها لك.")
+
+async def help_command(update: Update, context):
+    await update.message.reply_text(
+        "الأوامر المتاحة:\n"
+        "/start - بدء التفاعل مع البوت\n"
+        "/list - عرض الملفات المخزنة\n"
+        "أرسل لي ملفًا لرفعه."
+    )
 
 def main():
     create_db()
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("list", list_files))
+    app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.Document.ALL, upload_file))
     app.run_polling()
 
